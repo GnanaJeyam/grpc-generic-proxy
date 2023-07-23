@@ -1,0 +1,71 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.19'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'com.google.protobuf'
+
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
+group 'com.jeyam.grpc'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+    implementation 'io.grpc:grpc-all:1.48.0'
+    implementation 'com.google.protobuf:protobuf-java-util:3.21.1'
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:21.0-rc-1'
+    }
+    generateProtoTasks.generatedFilesBaseDir = 'grpc-stubs'
+
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.47.0'
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+}
+
+task spinGoServer() {
+    if (checkWhetherServerPortIsRunning()) {
+        println "Golang Server is already running in port 8090"
+        return
+    }
+    var dir = projectDir.toString() + "/go/server.go"
+    println "Starting the golang server in background " + dir
+    var runArgs = new String[] {"go", "run", dir};
+    new ProcessBuilder(runArgs).start()
+}
+
+boolean checkWhetherServerPortIsRunning() {
+    try (var socket = new ServerSocket(8090)) {
+        return false;
+    } catch (IOException ignored) {
+        return true;
+    }
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,12 @@
+{
+  "apiMappingDetails": [
+    {
+      "host": "http://localhost",
+      "port": "8090",
+      "reqUrl": "/hello",
+      "grpcServiceClass": "com.jeyam.grpc.helloworld.GreeterGrpc",
+      "grpcRequestMethodName": "helloworld.Greeter/SayHello",
+      "grpcMethodResponseClass": "com.jeyam.grpc.helloworld.HelloReply"
+    }
+  ]
+}
